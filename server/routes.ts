@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Friend, Post, User, WebSession } from "./app";
+import { Friend, Post, RadiusResource, User, WebSession } from "./app";
 import { PostDoc, PostOptions } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -135,6 +135,29 @@ class Routes {
     const user = WebSession.getUser(session);
     const fromId = (await User.getUserByUsername(from))._id;
     return await Friend.rejectRequest(fromId, user);
+  }
+
+  @Router.post("/radiusResources")
+  async createRadiusResource(
+    session: WebSessionDoc,
+    longitude: number,
+    latitude: number,
+    radius: number,
+    name: string,
+    status: string,
+    content: string,
+    criticalDates: [{ info: string; time: string }],
+  ) {
+    return await RadiusResource.createRadiusBasedResource(longitude, latitude, radius, name, status, content, criticalDates);
+  }
+
+  @Router.get("/radiusResources")
+  async getRadiusResources(session: WebSessionDoc, longitude: number, latitude: number, radius: number) {
+    longitude = Number(longitude);
+    latitude = Number(latitude);
+    const location = { longitude, latitude };
+    const resources = await RadiusResource.getAllResourceAtLocation(location);
+    return resources;
   }
 }
 
