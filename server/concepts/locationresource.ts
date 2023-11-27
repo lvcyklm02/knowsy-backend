@@ -8,13 +8,19 @@ export interface LocationResourceDoc extends BaseDoc {
   description: string;
   start: Date;
   status: string;
-  location: [number, number];
+  location: {
+    type: string;
+    coordinates: Array<number>;
+  };
 }
 
 export default class LocationResourceConcept {
   public readonly locationResources = new DocCollection<LocationResourceDoc>("locationResources");
 
-  async create(name: string, description: string, start: Date, status: string, location: [number, number]) {
+  async create(name: string, description: string, start: Date, status: string, longitude: number, latitude: number) {
+    longitude = Number(longitude);
+    latitude = Number(latitude);
+    const location = { type: "Point", coordinates: [longitude, latitude] };
     const _id = await this.locationResources.createOne({ name, description, start, status, location });
     return { msg: "Location Resource successfully created!", locationResource: await this.locationResources.readOne({ _id }) };
   }
@@ -24,6 +30,14 @@ export default class LocationResourceConcept {
       sort: { dateUpdated: -1 },
     });
     return locationResources;
+  }
+
+  async getWithinRadius(longitude: number, latitude: number, radius: number) {
+    return await this.locationResources.readMany({
+      location: {
+        $geoWithin: { $centerSphere: [[longitude, latitude], radius] },
+      },
+    });
   }
 
   async getById(_id: ObjectId) {
