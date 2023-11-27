@@ -77,6 +77,18 @@ const operations: operation[] = [
     method: "DELETE",
     fields: { id: "input" },
   },
+  {
+    name: "Create Resource",
+    endpoint: "/api/radiusResources",
+    method: "POST",
+    fields: { longitude: "input", latitude: "input", radius: "input", name: "input", status: "input", content: "input", criticalDates: "json" },
+  },
+  {
+    name: "Get Resources",
+    endpoint: "/api/radiusResources",
+    method: "GET",
+    fields: { longitude: "input", latitude: "input", radius: "input" },
+  },
 ];
 
 // Do not edit below here.
