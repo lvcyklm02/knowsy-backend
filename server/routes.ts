@@ -140,24 +140,70 @@ class Routes {
   @Router.post("/radiusResources")
   async createRadiusResource(
     session: WebSessionDoc,
-    longitude: number,
-    latitude: number,
-    radius: number,
+    longitude: string,
+    latitude: string,
+    radius: string,
     name: string,
     status: string,
     content: string,
     criticalDates: [{ info: string; time: string }],
   ) {
-    return await RadiusResource.createRadiusBasedResource(longitude, latitude, radius, name, status, content, criticalDates);
+    await RadiusResource.validNums(longitude, latitude, radius);
+    const long = parseFloat(longitude);
+    const lat = parseFloat(latitude);
+    const rad = parseFloat(radius);
+    return await RadiusResource.createRadiusBasedResource(long, lat, rad, name, status, content, criticalDates);
   }
 
   @Router.get("/radiusResources")
-  async getRadiusResources(session: WebSessionDoc, longitude: number, latitude: number, radius: number) {
-    longitude = Number(longitude);
-    latitude = Number(latitude);
-    const location = { longitude, latitude };
+  async getRadiusResources(session: WebSessionDoc, longitude: string, latitude: string) {
+    const long = parseFloat(longitude);
+    const lat = parseFloat(latitude);
+    const location = { longitude: long, latitude: lat };
     const resources = await RadiusResource.getAllResourceAtLocation(location);
     return resources;
+  }
+
+  @Router.get("/radiusResources/:_id")
+  async getRadiusResourceById(_id: ObjectId) {
+    return await RadiusResource.getRadiusResourceById(_id);
+  }
+
+  @Router.delete("/radiusResources/:_id")
+  async deleteRadiusResourceById(_id: ObjectId) {
+    return await RadiusResource.deleteRadiusResourceById(_id);
+  }
+
+  @Router.patch("/radiusResources/:_id/location")
+  async changeLocation(_id: ObjectId, longitude: string, latitude: string) {
+    await RadiusResource.validNums(longitude, latitude, "0");
+    const long = parseFloat(longitude);
+    const lat = parseFloat(latitude);
+    const location = { longitude: long, latitude: lat };
+    return await RadiusResource.changeLocation(_id, location);
+  }
+
+  @Router.patch("/radiusResources/:_id/status")
+  async changeStatus(_id: ObjectId, status: string) {
+    return await RadiusResource.changeStatus(_id, status);
+  }
+
+  @Router.patch("/radiusResources/:_id/description")
+  async changeDescription(_id: ObjectId, content: string) {
+    return await RadiusResource.changeDescription(_id, content);
+  }
+
+  @Router.patch("/radiusResources/:_id/criticalDates")
+  async changeCriticalDate(_id: ObjectId, criticalDates: [{ info: string; time: string }]) {
+    // do a little check on the critical dates to see if there are no invalid things
+    await RadiusResource.validCriticalDates(criticalDates);
+
+    // convert the time to an actual datetime object
+    const _criticalDates = criticalDates.map((criticalDates) => {
+      return { info: criticalDates.info, time: new Date(criticalDates.time) };
+    });
+
+    return await RadiusResource.changeCriticalDate(_id, _criticalDates);
   }
 }
 
