@@ -1,4 +1,3 @@
-import FriendConcept from "./concepts/friend";
 import LocationResourceConcept from "./concepts/locationresource";
 import PostConcept from "./concepts/post";
 import RadiusBasedResourceConcept from "./concepts/radiusBasedResource";
@@ -8,6 +7,5 @@ import WebSessionConcept from "./concepts/websession";
 export const WebSession = new WebSessionConcept();
 export const User = new UserConcept();
 export const Post = new PostConcept();
-export const Friend = new FriendConcept();
 export const LocationResource = new LocationResourceConcept();
 export const RadiusResource = new RadiusBasedResourceConcept();
