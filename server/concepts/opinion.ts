@@ -30,13 +30,15 @@ export default class OpinionConcept {
     return opinion;
   }
 
-  async getOpinionsByAuthor(author: ObjectId) {
-    return await this.getOpinions({ author: author });
-  }
+  // covered in above function:
 
-  async getOpinionsByRoot(root: ObjectId) {
-    return await this.getOpinions({ root: root });
-  }
+  // async getOpinionsByAuthor(author: ObjectId) {
+  //   return await this.getOpinions({ author: author });
+  // }
+
+  // async getOpinionsByRoot(root: ObjectId) {
+  //   return await this.getOpinions({ root: root });
+  // }
 
   async isAuthor(user: ObjectId, _id: ObjectId) {
     const opinion = await this.opinions.readOne({ _id });
