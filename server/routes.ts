@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Post, RadiusResource, User, WebSession } from "./app";
+import { LocationResource, Post, RadiusResource, User, WebSession } from "./app";
 import { PostDoc, PostOptions } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -160,9 +160,50 @@ class Routes {
   }
 
   @Router.post("/locationResources")
-  async createLocationResource() {
+  async createLocationResource(name: string, description: string, start: Date, status: string, longitude: number, latitude: number) {
+    const locationResource = await LocationResource.create(name, description, start, status, longitude, latitude);
+    
     return;
   }
+
+  @Router.get("/locationResources")
+  async getLocationResource(longitude: number, latitude: number, radius: number) {
+    const locationResources = await LocationResource.getWithinRadius(longitude, latitude, radius);
+    return locationResources;
+  }
+
+  @Router.get("/locationResources/:_id")
+  async getLocationResourceById(_id: ObjectId) {
+    const locationResource = await LocationResource.getById(_id);
+    return locationResource;
+  }
+
+  @Router.delete("/locationResources/:_id")
+  async deleteLocationResource(_id: ObjectId) {
+    const msg = await LocationResource.delete(_id);
+    return msg;
+  }
+
+  @Router.patch("/locationResources/:_id/location")
+  async updateLocationResourceLocation(_id: ObjectId, longitude: number, latitude: number) {
+    const msg = await LocationResource.update(_id, {location: { type: "Point", coordinates: [longitude, latitude] }});
+    return msg;
+  }
+
+  @Router.patch("/locationResources/:_id/status")
+  async updateLocationResourceStatus(_id: ObjectId, status: string) {
+    const msg = await LocationResource.update(_id, {status});
+    return msg;
+  }
+
+  @Router.patch("/locationResources/:_id/description")
+  async updateLocationResourceDescription(_id: ObjectId, description: string) {
+    const msg = await LocationResource.update(_id, {description});
+    return msg;
+  }
+
+
+
 }
 
 export default getExpressRouter(new Routes());
