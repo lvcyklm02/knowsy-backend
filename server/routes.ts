@@ -158,6 +158,11 @@ class Routes {
 
     return await RadiusResource.changeCriticalDate(_id, _criticalDates);
   }
+
+  @Router.post("/locationResources")
+  async createLocationResource() {
+    return;
+  }
 }
 
 export default getExpressRouter(new Routes());
