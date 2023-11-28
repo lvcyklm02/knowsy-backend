@@ -18,14 +18,12 @@ export default class RadiusBasedResourceConcept {
   public readonly radiusResources = new DocCollection<RadiusResourceDoc>("radiusResources");
 
   async createRadiusBasedResource(longitude: number, latitude: number, radius: number, name: string, status: string, content: string, criticalDates_: [{ info: string; time: string }]) {
-    await this.canCreateRadiusBasedResource(longitude, latitude, radius, name);
     await this.validCriticalDates(criticalDates_);
+    await this.canCreateRadiusBasedResource(name);
     const criticalDates = criticalDates_.map((criticalDate) => {
       return { info: criticalDate.info, time: new Date(criticalDate.time) };
     });
-    longitude = Number(longitude);
-    latitude = Number(latitude);
-    radius = Number(radius);
+
     const location = { type: "Point", coordinates: [longitude, latitude] };
     await this.radiusResources.createOne({ name, location, radius, content, status, criticalDates });
 
@@ -54,7 +52,6 @@ export default class RadiusBasedResourceConcept {
 
   async withinDistance(location1: { longitude: number; latitude: number }, location2: { longitude: number; latitude: number }, radius: number) {
     const distance = await this.calculateDistance(location1, location2);
-
     return distance <= radius;
   }
 
@@ -99,16 +96,17 @@ export default class RadiusBasedResourceConcept {
     }
   }
 
-  // async changeCriticalDate(_id: ObjectId,) {
-  //   const resouce = await this.radiusResources.readOne({ _id });
+  async changeCriticalDate(_id: ObjectId, criticalDates: Array<{ info: string; time: Date }>) {
+    const resouce = await this.radiusResources.readOne({ _id });
+    if (resouce) {
+      resouce.criticalDates = criticalDates;
+      await this.radiusResources.updateOne({ _id }, resouce);
 
-  //   if (resouce !== null) {
-  //     resouce.location.coordinates = [location.longitude, location.latitude];
-  //     await this.radiusResources.updateOne({ _id }, resouce);
+      return { msg: "Successfully updated the resource" };
+    }
 
-  //     return { msg: "Successfully updated the resources" };
-  //   }
-  // }
+    return { msg: "Couldn't update the critical dates" };
+  }
 
   async calculateDistance(location1: { longitude: number; latitude: number }, location2: { longitude: number; latitude: number }) {
     // calculates the distance between two locations
@@ -128,22 +126,20 @@ export default class RadiusBasedResourceConcept {
     return c;
   }
 
-  async canCreateRadiusBasedResource(longitude: number, latitude: number, radius: number, name: string) {
+  async canCreateRadiusBasedResource(name: string) {
     const resource = await this.radiusResources.readOne({ name });
 
     if (resource !== null) {
       throw new BadValuesError("Radius resource with the same name already exist");
     }
-
-    await this.validNums(longitude, latitude, radius);
   }
 
-  async validNums(longitude: number, latitude: number, radius: number) {
-    longitude = Number(longitude);
-    latitude = Number(latitude);
-    radius = Number(radius);
+  async validNums(longitude: string, latitude: string, radius: string) {
+    const long = Number(longitude);
+    const lat = Number(latitude);
+    const rad = Number(radius);
 
-    if (isNaN(longitude) || isNaN(latitude) || isNaN(radius)) {
+    if (isNaN(long) || isNaN(lat) || isNaN(rad)) {
       throw new BadValuesError("Some of the values are not numbers");
     }
   }

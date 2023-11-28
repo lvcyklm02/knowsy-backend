@@ -87,7 +87,43 @@ const operations: operation[] = [
     name: "Get Resources",
     endpoint: "/api/radiusResources",
     method: "GET",
-    fields: { longitude: "input", latitude: "input", radius: "input" },
+    fields: { longitude: "input", latitude: "input" },
+  },
+  {
+    name: "Get Resource By Id",
+    endpoint: "/api/radiusResources/:id",
+    method: "GET",
+    fields: { id: "input" },
+  },
+  {
+    name: "Delete Resource By Id",
+    endpoint: "/api/radiusResources/:id",
+    method: "DELETE",
+    fields: { id: "input" },
+  },
+  {
+    name: "Change Location",
+    endpoint: "/api/radiusResources/:id/location",
+    method: "PATCH",
+    fields: { id: "input", longitude: "input", latitude: "input" },
+  },
+  {
+    name: "Change Status",
+    endpoint: "/api/radiusResources/:id/status",
+    method: "PATCH",
+    fields: { id: "input", status: "input" },
+  },
+  {
+    name: "Change Description",
+    endpoint: "/api/radiusResources/:id/description",
+    method: "PATCH",
+    fields: { id: "input", content: "input" },
+  },
+  {
+    name: "Change Critical Dates",
+    endpoint: "/api/radiusResources/:id/criticalDates",
+    method: "PATCH",
+    fields: { id: "input", criticalDates: "json" },
   },
 ];
 
