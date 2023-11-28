@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { LocationResource, Post, RadiusResource, User, WebSession } from "./app";
+import { LocationResource, Opinion, Post, RadiusResource, User, WebSession } from "./app";
 import { PostDoc, PostOptions } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -70,9 +70,9 @@ class Routes {
   }
 
   @Router.post("/posts")
-  async createPost(session: WebSessionDoc, content: string, options?: PostOptions) {
+  async createPost(session: WebSessionDoc, project: ObjectId, content: string, options?: PostOptions) {
     const user = WebSession.getUser(session);
-    const created = await Post.create(user, content, options);
+    const created = await Post.create(user, project, content, options);
     return { msg: created.msg, post: await Responses.post(created.post) };
   }
 
@@ -204,6 +204,31 @@ class Routes {
 
 
 
+
+  @Router.post("/posts/:_id/opinions")
+  async createOpinion(author: ObjectId, content: string, feeling: Number, root: ObjectId) {
+    return await Opinion.createOpinion(author, content, feeling, root);
+  }
+
+  @Router.get("/opinions")
+  async getOpinions(author?: ObjectId, root?: ObjectId) {
+    let opinions;
+    if (author) {
+      opinions = await Opinion.getOpinions(author);
+    } else if (root) {
+      opinions = await Opinion.getOpinions(root);
+    } else {
+      opinions = await Post.getPosts({});
+    }
+    return opinions;
+  }
+
+  @Router.delete("/opinions/:_id")
+  async deleteOpinion(session: WebSessionDoc, _id: ObjectId) {
+    const user = WebSession.getUser(session);
+    await Opinion.isAuthor(user, _id);
+    return Opinion.delete(_id);
+  }
 }
 
 export default getExpressRouter(new Routes());

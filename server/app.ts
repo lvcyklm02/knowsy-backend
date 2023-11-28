@@ -12,3 +12,5 @@ export const Post = new PostConcept();
 export const LocationResource = new LocationResourceConcept();
 export const RadiusResource = new RadiusBasedResourceConcept();
 export const Opinion = new OpinionConcept();
+
+export const Opinion = new OpinionConcept();

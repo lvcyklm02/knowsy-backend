@@ -125,6 +125,24 @@ const operations: operation[] = [
     method: "PATCH",
     fields: { id: "input", criticalDates: "json" },
   },
+  {
+    name: "Create Opinion",
+    endpoint: "/api/posts/:id/opinions",
+    method: "POST",
+    fields: { id: "input", content: "input", feeling: "input", root: "input" },
+  },
+  {
+    name: "Get Opinions (empty for all)",
+    endpoint: "/api/opinions",
+    method: "GET",
+    fields: { author: "input", root: "input" },
+  },
+  {
+    name: "Delete Opinion",
+    endpoint: "/api/opinions/:id",
+    method: "DELETE",
+    fields: { id: "input" },
+  },
 ];
 
 // Do not edit below here.
