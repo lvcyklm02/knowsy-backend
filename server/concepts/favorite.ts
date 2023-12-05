@@ -11,13 +11,15 @@ export interface FavoriteDoc extends BaseDoc {
 export default class FavoriteConcept {
   public readonly favorites = new DocCollection<FavoriteDoc>("favorites");
 
-  async createFavorite(author: ObjectId, target: ObjectId) {
+  async addFavorite(author: ObjectId, target: ObjectId) {
     const _id = await this.favorites.createOne({ author, target });
-    return { msg: "Favorite successfully created!", Favorite: await this.favorites.readOne({ _id }) };
+    return { msg: "Favorite successfully added!", Favorite: await this.favorites.readOne({ _id }) };
   }
 
-  async delete(_id: ObjectId) {
+  async removeFavorite(_id: ObjectId) {
+    console.log("statement below");
     await this.favorites.deleteOne({ _id });
+    console.log("statement below");
     return { msg: "Favorite deleted successfully!" };
   }
 
@@ -26,6 +28,14 @@ export default class FavoriteConcept {
       sort: { dateUpdated: -1 },
     });
     return Favorite;
+  }
+
+  async getFavoriteId(user: ObjectId, target:ObjectId) {
+    const fave = await this.favorites.readOne({author: user, target: target});
+    if (!fave) {
+        throw new NotFoundError(`Favorite of user ${user} and target ${target}does not exist!`)
+    }
+    return fave._id;
   }
 
   async isAuthor(user: ObjectId, _id: ObjectId) {

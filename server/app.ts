@@ -1,3 +1,4 @@
+import FavoriteConcept from "./concepts/favorite";
 import LocationResourceConcept from "./concepts/locationresource";
 import OpinionConcept from "./concepts/opinion";
 import PostConcept from "./concepts/post";
@@ -12,3 +13,4 @@ export const Post = new PostConcept();
 export const LocationResource = new LocationResourceConcept();
 export const RadiusResource = new RadiusBasedResourceConcept();
 export const Opinion = new OpinionConcept();
+export const Favorite = new FavoriteConcept();

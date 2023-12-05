@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { LocationResource, Opinion, Post, RadiusResource, User, WebSession } from "./app";
+import { Favorite, LocationResource, Opinion, Post, RadiusResource, User, WebSession } from "./app";
 import { PostDoc, PostOptions } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -202,9 +202,6 @@ class Routes {
     return msg;
   }
 
-
-
-
   @Router.post("/posts/:_id/opinions")
   async createOpinion(author: ObjectId, content: string, feeling: Number, root: ObjectId) {
     return await Opinion.createOpinion(author, content, feeling, root);
@@ -229,7 +226,39 @@ class Routes {
     await Opinion.isAuthor(user, _id);
     return Opinion.delete(_id);
   }
+
+  @Router.post("/favorites/:_id")
+  async addFavorite(session: WebSessionDoc, _id: ObjectId) {
+    const user = WebSession.getUser(session);
+    const msg = await Favorite.addFavorite(user, _id);
+    return msg;
+  }
+
+  @Router.delete("/favorites/:target_id")
+  async removeFavorite(session: WebSessionDoc, target_id: ObjectId) {
+    const user = WebSession.getUser(session);
+    const id = await Favorite.getFavoriteId(user, target_id);
+    await Favorite.isAuthor(user, id)
+    const msg = await Favorite.removeFavorite(id);
+    return msg;
+  }
+
+  @Router.get("/favorites")
+  async getFavorites(author?: ObjectId, target?: ObjectId) {
+    let favorites;
+    if (author && target) {
+      favorites = await Favorite.getFavorites({author: author, target: target});
+    } else if (author) {
+      favorites = await Favorite.getFavorites({author: author});
+    } else if (target) {
+      favorites = await Favorite.getFavorites({target: target});
+    } else {
+      favorites = await Favorite.getFavorites({});
+    }
+    
+    return favorites;
+  }
+
 }
 
 export default getExpressRouter(new Routes());
-b
